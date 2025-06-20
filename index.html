@@ -1,9 +1,5 @@
-#!/usr/bin/env python3
-import os
-from http.server import HTTPServer, SimpleHTTPRequestHandler
 
-# 1. Write out the HTML
-html = """<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -474,14 +470,4 @@ html = """<!DOCTYPE html>
   </script>
 </body>
 </html>
-"""
-with open("index.html", "w", encoding="utf-8") as f:
-    f.write(html)
-print("✓ Generated index.html")
 
-# 2. Serve it at http://localhost:8000
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
-PORT = 8000
-print(f"🚀 Serving on http://localhost:{PORT}\nPress Ctrl+C to stop.")
-server = HTTPServer(("0.0.0.0", PORT), SimpleHTTPRequestHandler)
-server.serve_forever()
