@@ -437,7 +437,7 @@ html = """
       </div>
       <!-- Card 2 -->
       <div class="feature-card">
-        <img src="images/PrivacyISO.gif" alt="Privacy Quality Assessment System">
+        <img src="images/PrivacyISO_Cropped.gif" alt="Privacy Quality Assessment System">
         <div class="feature-info">
           <h3>Privacy Quality Assessment System</h3>
           <p>
@@ -694,7 +694,7 @@ html = """
         <!-- Replace with your actual embed link -->
         <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d715.0254904204679!2d-76.48454360213405!3d42.450946626487934!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89d08220beb430eb%3A0xa53ba1f6539451cb!2sCornell%20University%20College%20of%20Architecture%2C%20Art%2C%20and%20Planning!5e0!3m2!1sen!2sus!4v1750376662344!5m2!1sen!2sus" loading="lazy"></iframe>
       </div>
-      <form class="contact-form">
+      <form class="contact-form" action="https://script.google.com/macros/s/AKfycbwVU91AJDbhUefnVaVoJ9Rv37TO-3bfnQDeYTFLoPnD2TDebJ0mmdiJcHoTpAsnviOL_g/exec" method="post">
         <label for="email">Email</label>
         <input id="email" type="email" required>
 
@@ -751,4 +751,5 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 PORT = 8000
 print(f"🚀 Serving on http://localhost:{PORT}\nPress Ctrl+C to stop.")
 server = HTTPServer(("0.0.0.0", PORT), SimpleHTTPRequestHandler)
-server.serve_forever()-->
+server.serve_forever()
+-->
