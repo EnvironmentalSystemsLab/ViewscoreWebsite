@@ -1,197 +1,487 @@
-<!DOCTYPE html>
+#!/usr/bin/env python3
+import os
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+
+# 1. Write out the HTML
+html = """<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viewscore.io – Transforming How You Track Metrics</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; color: #333; }
-        header, footer { background-color: #333; color: #fff; padding: 1em 0; text-align: center; }
-        .container { width: 90%; max-width: 1200px; margin: 0 auto; }
-        .hero { background-image: url('dashboard-hero.jpg'); background-size: cover; background-position: center; color: #fff; text-align: center; padding: 100px 20px; }
-        .hero h1 { font-size: 3em; margin: 0; }
-        .hero p { font-size: 1.2em; margin-top: 10px; }
-        .button { background-color: #ff5722; color: #fff; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; }
-        nav a { color: #fff; text-decoration: none; margin: 0 10px; font-weight: bold; }
-        section { padding: 60px 0; }
-        section h2 { text-align: center; font-size: 2.5em; margin-bottom: 20px; }
-        .step, .feature, .use-case, .about-item, .success-item { margin-bottom: 20px; }
-        #pricing p, #about p, #success p, #get-started p { max-width: 800px; margin: 0 auto 20px; text-align: center; line-height: 1.6; }
-        blockquote { font-style: italic; margin: 20px auto; max-width: 800px; text-align: center; }
-        footer .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-        footer nav a { color: #fff; text-decoration: none; margin: 0 10px; }
-        .socials a { margin: 0 10px; color: #fff; text-decoration: none; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Viewscore.io – Occupant Satisfaction Prediction</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Theme colors */
+    :root {
+      --color-primary: #0072E3;
+      --color-secondary: #787878;
+      --color-bg: #f9f9f9;
+      --color-text: #333;
+      --font-stack: 'Inter', sans-serif;
+      --transition: 0.3s ease;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 0;
+      font-family: var(--font-stack);
+      color: var(--color-text);
+      background: var(--color-bg);
+      scroll-behavior: smooth;
+    }
+    a { color: var(--color-primary); text-decoration: none; transition: color var(--transition); }
+    a:hover { color: var(--color-secondary); }
+
+    /* Header */
+    header {
+      position: sticky; top: 0;
+      background: #fff;
+      border-bottom: 1px solid #ececec;
+      z-index: 100;
+    }
+    .nav-container {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px;
+    }
+    .logo { font-size: 1.5rem; font-weight: 700; }
+    nav { display: flex; gap: 24px; }
+    nav a { font-weight: 600; font-size: 0.95rem; }
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      cursor: pointer;
+    }
+    .hamburger span {
+      width: 24px; height: 3px;
+      background: var(--color-text);
+      transition: transform var(--transition);
+    }
+
+    /* Hero slider */
+    .hero {
+      padding: 20px 7%;                   /* no side gutters */
+      position: relative; 
+      left: 50%; 
+      right: 50%;
+      margin-left: -50vw;           /* break out of any container */
+      margin-right: -50vw;
+      width: 100vw; 
+      max-width: 100vw;
+      overflow: auto;
+      /* 2) Lock the height to 16:9 of its full width */
+      aspect-ratio: 20 / 7;
+      height: auto;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 1);
+      z-index: 0;
+    }
+    .hero .slides {
+      position: relative; width: 100%; height: 100%;
+    }
+    .hero .slide {
+      position: absolute; inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+      height: 100%;
+    }
+    .hero .slide.active {
+      opacity: 1;
+    }
+    .hero-content {
+      position: absolute; bottom: 30%; left: 5%;
+      z-index: 1; max-width: 600px; color: #151515;;
+    }
+    .hero h1 {
+      font-size: 2.5rem; margin-bottom: 0.5rem; line-height: 1.2;
+    }
+    .hero p {
+      font-size: 1.1rem; margin-bottom: 1.5rem;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: var(--color-secondary);
+      color: #fff;
+      font-weight: 600;
+      border-radius: 4px;
+      transition: background var(--transition);
+    }
+    .btn + .btn { margin-left: 12px; }
+    .btn:hover { background: #e64a19; }
+
+    /* Sections */
+    section { 
+      max-width: 1200px;    /* or whatever your ideal content width is */
+      margin: 0 auto;       /* centers each section */
+      padding: 60px 20px;   /* comfortable top/bottom and small side padding */ }
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      border-left: 4px solid var(--color-primary);
+      padding-left: 10px;
+    }
+
+    /* Grid helpers */
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 32px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 24px; }
+
+    /* Features */
+    .features .item {
+      background: #fff; padding: 24px;
+      border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      transition: transform var(--transition);
+    }
+    .features .item:hover { transform: translateY(-4px); }
+    .features h3 { color: var(--color-primary); margin-bottom: 0.5rem; }
+    .features p { color: #555; font-size: 0.95rem; }
+
+    /* Product & Service */
+    .ps-item img { width:100%; border-radius:6px; }
+
+    /* Research */
+    #research ul {
+      display: block;
+      list-style: disc outside;
+      padding-left: 1.5rem;
+      margin: 0 0 2rem;
+    }
+    #research li {
+      margin-bottom: 0.75rem;
+      line-height: 1.4;
+    }
+    #research a {
+      color: var(--color-primary);
+      text-decoration: none;
+      transition: color var(--transition);
+    }
+    #research a:hover {
+      color: var(--color-secondary);
+    }
+
+
+
+    /* Demo */
+    #demo.demo {
+      text-align: center;    /* keep everything centered by default */
+    }
+    #demo.demo h2 {
+      text-align: left;      /* override to left-align the title */
+      margin-bottom: 1rem;
+    }
+    #demo.demo video {
+      display: block;
+      width: 100%;
+      max-width: 800px;
+      height: auto;             /* preserve aspect ratio */
+      margin: 0 auto 1rem;      /* center it */
+      border-radius: 6px;
+      aspect-ratio: 16 / 9;     /* CSS lock to 16:9 */
+      object-fit: Cover;
+    }
+    /* Team */
+    .team-item {
+      text-align: center;
+      transition: transform var(--transition);
+      margin-top: 10px;
+    }
+    .team-item:hover { transform: translateY(-6px); }
+    .team-item img {
+      width: 180px; height:180px;
+      object-fit: cover; border-radius:50%;
+      border: 3px solid var(#fff);
+    }
+    .team-item p { margin-top: 20px; font-weight: 600; }
+
+    /* Contact */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      /* first value = row-gap, second = column-gap */
+      gap: 0px 60px;  
+      /* ↓ other props unchanged */
+      grid-template-rows: auto auto;
+      align-items: start;
+    }
+
+    /* Map goes in row 1, col 1 */
+    .contact-grid .map {
+      grid-column: 1;
+      grid-row:    2;
+    }
+
+    /* Form goes in col 2, but spans both rows 
+      so it always fills the full height of row 1 */
+    .contact-grid .contact-form {
+      grid-column: 2;
+      grid-row:    1 / span 2;
+    }
+
+    /* Info goes in row 2, col 1 */
+    .contact-grid .contact-info {
+      grid-column: 1;
+      grid-row:    1;
+    }
+
+    /* Make the map fill its grid cell (so it stretches to match the form’s height) */
+    .contact-grid .map,
+    .contact-grid .map iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 6px;
+      display: block;
+    }
+    .contact-form label {
+      display: block; margin: 12px 0 4px;
+      font-weight: 600; font-size: 0.95rem;
+    }
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%; padding: 8px; border:1px solid #ccc; border-radius:4px;
+      font-size: 0.95rem;
+    }
+
+
+    /* Footer */
+    footer {
+      text-align: center; padding: 24px 5%;
+      color: #777; font-size: 0.85rem; border-top:1px solid #ececec;
+    }
+
+    /* Responsive nav */
+    @media (max-width: 768px) {
+      nav { display: none; position: absolute; top:64px; right:5%; background:#fff; flex-direction: column; box-shadow:0 2px 8px rgba(0,0,0,0.1); border-radius:4px; }
+      nav.show { display: flex; }
+      .hamburger { display: flex; }
+    }
+  </style>
 </head>
 <body>
 
-<header>
-    <div class="container">
-        <h1>Viewscore.io</h1>
-        <nav>
-            <a href="#how-it-works">How It Works</a> |
-            <a href="#features">Key Features</a> |
-            <a href="#use-cases">Use Cases</a> |
-            <a href="#pricing">Pricing Plans</a> |
-            <a href="#about">About Us</a> |
-            <a href="#success">Success Stories</a> |
-            <a href="#get-started">Get Started</a>
-        </nav>
+  <header>
+    <div class="nav-container">
+      <div class="logo">Viewscore.io</div>
+      <div class="hamburger" onclick="document.querySelector('nav').classList.toggle('show')">
+        <span></span><span></span><span></span>
+      </div>
+      <nav>
+        <a href="#features">Features</a>
+        <a href="#product">Product</a>
+        <a href="#research">Research</a>
+        <a href="#demo">Demo</a>
+        <a href="#team">Team</a>
+        <a href="#support">Support</a>
+      </nav>
     </div>
-</header>
+  </header>
 
-<section class="hero">
-    <div class="container">
-        <h1>Transforming How You Track Metrics</h1>
-        <p>The AI-powered analytics platform that consolidates your data from multiple sources into one intuitive dashboard.</p>
-        <button class="button">Start Free Trial</button>
-        <button class="button" style="margin-left: 15px;">Book a Demo</button>
+  <section class="hero" role="banner">
+    <div class="slides">
+      <div class="slide active" style="background-image: url('images/TitleImage1.png')">
+        <div class="hero-content">
+          <h1>Predictive<br>Design Intelligence</h1>
+          <p>for Measurable Satisfaction</p>
+          <a href="#demo" class="btn">Book a Demo</a>
+          <a href="#features" class="btn">Learn More</a>
+        </div>
+      </div>
+      <div class="slide" style="background-image: url('images/TitleImage2.png')">
+        <div class="hero-content">
+          <h1>Boost<br>Your Listing</h1>
+          <p>with Occupant Satisfaction Data</p>
+          <a href="#demo" class="btn">Book a Demo</a>
+          <a href="#features" class="btn">Learn More</a>
+        </div>
+      </div>
     </div>
-</section>
+  </section>
 
-<section id="how-it-works">
-    <div class="container">
-        <h2>How It Works</h2>
-        <div class="step">
-            <h3>Connect</h3>
-            <p>Seamlessly integrate with your existing tools like Google Analytics, Salesforce, and 30+ other platforms.</p>
-        </div>
-        <div class="step">
-            <h3>Collect</h3>
-            <p>Automated data collection pulls information from all your platforms into one central location.</p>
-        </div>
-        <div class="step">
-            <h3>Visualize</h3>
-            <p>Custom dashboards display your key metrics in real time, set up in under 10 minutes.</p>
-        </div>
-        <div class="step">
-            <h3>Analyze</h3>
-            <p>AI-driven insights identify trends and opportunities you might otherwise miss.</p>
-        </div>
+  <section id="features">
+    <h2>Key Features</h2>
+    <div class="features grid-2">
+      <div class="item">
+        <h3>Optimize Design</h3>
+        <p>Run rapid simulations to fine-tune your layouts for maximum occupant satisfaction.</p>
+      </div>
+      <div class="item">
+        <h3>Evaluate Property</h3>
+        <p>Assess daylight, view quality, and privacy scores across your building portfolio.</p>
+      </div>
+      <div class="item">
+        <h3>Boost Transactions</h3>
+        <p>Leverage data-driven visuals to sell or lease spaces faster and at higher rates.</p>
+      </div>
+      <div class="item">
+        <h3>API Access</h3>
+        <p>Integrate Viewscore into your own systems via our RESTful endpoints.</p>
+      </div>
     </div>
-</section>
+  </section>
 
-<section id="features">
-    <div class="container">
-        <h2>Key Features</h2>
-        <div class="feature">
-            <h3>Unified Dashboard</h3>
-            <p>Access data from 30+ integrations in one intuitive interface, customized for different team members’ needs.</p>
-        </div>
-        <div class="feature">
-            <h3>Automated Reporting</h3>
-            <p>Schedule weekly or monthly performance reports delivered directly to stakeholders with zero manual effort.</p>
-        </div>
-        <div class="feature">
-            <h3>Smart Alerts</h3>
-            <p>Receive notifications when metrics show unusual patterns or reach predefined thresholds.</p>
-        </div>
-        <div class="feature">
-            <h3>Mobile Access</h3>
-            <p>Track your critical metrics on the go with our full-featured mobile app for iOS and Android.</p>
-        </div>
+  <section id="product">
+    <h2>Product</h2>
+    <div class="ps-grid grid-3">
+      <div class="ps-item">
+        <h3>Software</h3>
+        <img src="https://via.placeholder.com/300x200" alt="Software screenshot">
+      </div>
+      <div class="ps-item">
+        <h3>API</h3>
+        <img src="https://via.placeholder.com/300x200" alt="API example">
+      </div>
+      <div class="ps-item">
+        <h3>Consulting</h3>
+        <img src="https://via.placeholder.com/300x200" alt="Consulting service">
+      </div>
     </div>
-</section>
+  </section>
 
-<section id="use-cases">
-    <div class="container">
-        <h2>Use Cases</h2>
-        <div class="use-case">
-            <h3>Marketing Teams</h3>
-            <p>Track campaign performance across channels, measure ROI, and optimize ad spend based on real-time data.</p>
-        </div>
-        <div class="use-case">
-            <h3>Sales Departments</h3>
-            <p>Monitor conversion metrics, pipeline health, and sales team performance with customizable KPIs.</p>
-        </div>
-        <div class="use-case">
-            <h3>Product Teams</h3>
-            <p>Analyze user behavior, feature adoption, and usage patterns to guide product development decisions.</p>
-        </div>
-        <div class="use-case">
-            <h3>E-commerce</h3>
-            <p>Keep track of sales, inventory levels, customer metrics, and shipping performance all in one place.</p>
-        </div>
+  <!-- Replace your old research section with this: -->
+  <section id="research">
+  <h2>Research Publications</h2>
+  <ul>
+    <li>
+      Kim, J., Kral, K., Ko, W.H., Kent, M., Schiavon, S., Dogan, T. 
+      <a href="https://www.sciencedirect.com/science/article/pii/S0360132322001548" target="_blank">
+        <em>Window View Satisfaction Assessment Method: A Comparison of Physical Space, Virtual Reality, and Digital Image</em>
+      </a>. LEUKOS.
+    </li>
+    <li>
+      Kim, J., Kent, M., Kral, K., Dogan, T. 
+      <a href="https://www.sciencedirect.com/science/article/pii/S0360132322001548" target="_blank">
+        <em>A New Tool for Early Design Window View Satisfaction Evaluation in Residential Buildings</em>
+      </a>. Building and Environment.
+    </li>
+    <li>
+      Kim, J., Escamilla-Guerrero, M., Kral, K., Dogan, T. 
+      <a href="https://www.researchgate.net/publication/392508669_TOWARDS_QUANTIFYING_VISUAL_EXPOSURE_AND_THE_RESULTING_PRIVACY_CONCERNS_IN_RESIDENTIAL_BUILDING" target="_blank">
+        <em>Comparative Analysis of Human Qualitative Assessment and Established Daylight, View, and Privacy Metrics in Urban Residential Spaces: A New York City Case Study</em>
+      </a>. IBPSA 2025 Conference.
+    </li>
+    <li>
+      Kim, J., Kral, K., Dogan, T. 
+      <a href="https://www.researchgate.net/publication/392508669_TOWARDS_QUANTIFYING_VISUAL_EXPOSURE_AND_THE_RESULTING_PRIVACY_CONCERNS_IN_RESIDENTIAL_BUILDING" target="_blank">
+        <em>Towards Quantifying Visual Exposure and The Resulting Privacy Concerns in Residential Building</em>
+      </a>. ANNSIM 2025 Conference.
+    </li>
+  </ul>
+  </section>
+
+
+
+  <section id="demo" class="demo">
+    <h2>Demo</h2>
+
+    <video
+      autoplay
+      loop
+      muted
+      playsinline
+      width="100%"
+      style="max-width:800px; border-radius:6px;"
+    >
+      <source src="images/Seemo Demo.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+
+    <p><a href="#support" class="btn">Request trial</a></p>
+  </section>
+
+  <section id="team">
+    <h2>Meet the Team</h2>
+    <div class="ps-grid grid-2 team-grid">
+      <div class="team-item">
+        <a 
+          href="https://www.linkedin.com/in/jaeha-kim-90ba18b4/" 
+          target="_blank" 
+          rel="noopener noreferrer"
+        >
+          <img src="images/JaehaKim.png" alt="Jaeha Kim">
+        </a>
+        <p>Jaeha Kim<br><small>CEO &amp; Co-Founder</small></p>
+      </div>
+      <div class="team-item">
+        <a 
+          href="https://www.linkedin.com/in/timur-dogan-b28340a9/" 
+          target="_blank" 
+          rel="noopener noreferrer"
+        >
+          <img src="images/TimurDogan.png" alt="Timur Dogan">
+          </a>
+        <p>Timur Dogan<br><small>CTO &amp; Co-Founder</small></p>
+      </div>
     </div>
-</section>
+  </section>
 
-<section id="pricing">
-    <div class="container">
-        <h2>Pricing Plans</h2>
-        <p>Save 20% with annual billing on all plans. Enterprise customers receive personalized onboarding and a dedicated account manager.</p>
-        <!-- Pricing table or plan details would go here -->
+  <section id="support">
+    <h2>Contact &amp; Support</h2>
+    <div class="contact-grid">
+      <!-- Row 1, Col 1: map -->
+       <div class="map" style="margin-bottom:40px;">
+        <!-- Replace with your actual embed link -->
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d715.0254904204679!2d-76.48454360213405!3d42.450946626487934!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89d08220beb430eb%3A0xa53ba1f6539451cb!2sCornell%20University%20College%20of%20Architecture%2C%20Art%2C%20and%20Planning!5e0!3m2!1sen!2sus!4v1750376662344!5m2!1sen!2sus" loading="lazy"></iframe>
+      </div>
+      <form class="contact-form">
+        <label for="email">Email</label>
+        <input id="email" type="email" required>
+
+        <label for="name">Name</label>
+        <input id="name" type="text" required>
+
+        <label for="company">Company</label>
+        <input id="company" type="text">
+
+        <label for="subject">Subject</label>
+        <textarea id="subject" rows="1" required></textarea>
+
+        <label for="message">Message</label>
+        <textarea id="message" rows="7" required></textarea>
+
+        <button type="submit" class="btn" style="margin-top:30px;">Send Message</button>
+      </form>
+
+
+      <div class="'contact-info">
+        <p>Have a question about Viewscore.io? <br>Want to learn more about our product or trial version? <br>We'd love to hear from you. <br>Fill out the form and our team will get back to you shortly.<br></p>
+        <p><strong>Address</strong><br>250B Sibley Hall, Ithaca, NY 14850</p>
+        <p><strong>Email</strong><br>support@viewscore.io</p>
+      </div>
+      
     </div>
-</section>
+    
+  </section>
 
-<section id="about">
-    <div class="container">
-        <h2>About Us</h2>
-        <div class="about-item">
-            <h3>Data Science Experts</h3>
-            <p>Founded by former data scientists from leading tech companies with a mission to make analytics accessible to all.</p>
-        </div>
-        <div class="about-item">
-            <h3>Backed by Experience</h3>
-            <p>$1.5M in seed funding from notable investors who believe in our vision for simplified business intelligence.</p>
-        </div>
-        <div class="about-item">
-            <h3>Core Values</h3>
-            <p>Built on principles of simplicity, accuracy, privacy, and continuous improvement in everything we do.</p>
-        </div>
-    </div>
-</section>
+  <footer>
+    &copy; 2025 Viewscore.io  |  Privacy Policy  |  Terms of Service
+  </footer>
 
-<section id="success">
-    <div class="container">
-        <h2>Customer Success Stories</h2>
-        <div class="success-item">
-            <h3>Conversion Boost</h3>
-            <p>E-commerce retailer increased their conversion rate by 37% after identifying underperforming marketing channels through Viewscore’s unified analytics.</p>
-        </div>
-        <div class="success-item">
-            <h3>Time Savings</h3>
-            <blockquote>
-                “Viewscore saved our marketing team 15+ hours per week on reporting. We now spend that time implementing insights instead.”<br>
-                — Marketing Director, Company XYZ
-            </blockquote>
-        </div>
-        <div class="success-item">
-            <h3>ROI Impact</h3>
-            <p>Average customer sees 4.5× return on investment within the first three months through optimized spending and improved performance.</p>
-        </div>
-        <div class="success-item">
-            <h3>Support Excellence</h3>
-            <p>98% customer support satisfaction rating with most issues resolved within 2 hours of submission.</p>
-        </div>
-    </div>
-</section>
-
-<section id="get-started">
-    <div class="container">
-        <h2>Get Started Today</h2>
-        <p>Sign Up Free – Create your account and start a 30-day trial with full access to all features. No credit card required.</p>
-        <p>Connect Your Data – Integrate your existing tools through our simple connector system. Most setups take less than 10 minutes.</p>
-        <p>Customize Your Dashboard – Choose the metrics that matter most to your business and arrange them in your personalized dashboard.</p>
-        <p>Start Making Better Decisions – Leverage real-time insights to optimize your business operations and drive growth.</p>
-        <p>Need help getting started? Contact our team at <a href="mailto:support@viewscore.io" style="color: #ff5722;">support@viewscore.io</a> or join our weekly live walkthrough every Wednesday at 1 pm ET.</p>
-    </div>
-</section>
-
-<footer>
-    <div class="container">
-        <p>&copy; 2025 Viewscore.io. All rights reserved.</p>
-        <nav>
-            <a href="#about">About Us</a> |
-            <a href="#privacy">Privacy Policy</a> |
-            <a href="#terms">Terms of Service</a>
-        </nav>
-        <div class="socials">
-            <a href="#">Facebook</a>
-            <a href="#">Twitter</a>
-            <a href="#">LinkedIn</a>
-        </div>
-    </div>
-</footer>
-
+  <script>
+    const slides = document.querySelectorAll('.hero .slide');
+    let current = 0;
+    setInterval(() => {
+      slides[current].classList.remove('active');
+      current = (current + 1) % slides.length;
+      slides[current].classList.add('active');
+    }, 5000); // 5000ms = 5s per slide
+  </script>
 </body>
 </html>
+"""
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(html)
+print("✓ Generated index.html")
+
+# 2. Serve it at http://localhost:8000
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+PORT = 8000
+print(f"🚀 Serving on http://localhost:{PORT}\nPress Ctrl+C to stop.")
+server = HTTPServer(("0.0.0.0", PORT), SimpleHTTPRequestHandler)
+server.serve_forever()
