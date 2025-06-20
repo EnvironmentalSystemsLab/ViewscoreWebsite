@@ -1,4 +1,10 @@
+<!--#!/usr/bin/env python3
+import os
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 
+# 1. Write out the HTML
+html = """
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -129,7 +135,7 @@
     .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 32px; }
     .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 24px; }
 
-    /* Features */
+    /* Features old 
     .features .item {
       background: #fff; padding: 24px;
       border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.05);
@@ -138,9 +144,122 @@
     .features .item:hover { transform: translateY(-4px); }
     .features h3 { color: var(--color-primary); margin-bottom: 0.5rem; }
     .features p { color: #555; font-size: 0.95rem; }
+    */
+
+    /* wrap cards in a vertical stack with spacing */
+    .features-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      padding: 60px 20px;              /* same vertical padding as other sections */
+    }
+
+    .feature-subcategory {
+      font-size: 1.5rem;               /* adjust size */
+      font-weight: 600;                /* semi-bold */
+      color: var(--color-primary);     /* match your palette */
+      margin: 40px 0 16px;             /* space above & below */
+      padding-left: 24px;              /* align with your card text */
+      border-left: 4px solid var(--color-primary);
+    }
+
+    /* each card is a 2-column grid */
+    .feature-card {
+      display: grid;
+      grid-template-columns: 3fr 4fr;
+      grid-template-areas: "info image";
+      align-items: center;       /* vertically center everything in the row */
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      overflow: hidden;
+      transition: transform var(--transition);
+    }
+    .feature-card:hover { transform: translateY(-4px); }
+
+    /* image takes full height of card, scales to fit */
+    .feature-card img {
+      grid-area: image;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* text side padding and layout */
+    .feature-info {
+      grid-area: info;
+      padding: 24px;
+    }
+    .feature-info h3 {
+      font-size: 1.75rem;
+      margin-bottom: 0.75rem;
+      color: var(--color-text);
+    }
+    .feature-info p {
+      line-height: 1.6;
+      color: #555;
+      margin-bottom: 1.5rem;
+    }
+
+    /* secondary button style */
+    .btn-secondary {
+      display: inline-block;
+      padding: 10px 24px;
+      background: var(--color-primary);
+      color: #fff;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background var(--transition);
+    }
+    .btn-secondary:hover {
+      background: var(--color-secondary);
+    }
 
     /* Product & Service */
     .ps-item img { width:100%; border-radius:6px; }
+
+    /* Product cards layout */
+    .product-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+      padding: 60px 5%;  /* match your other sections */
+    }
+
+    /* Individual card styling */
+    .product-card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+    }
+
+    /* Image atop */
+    .product-card img {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+    }
+
+    /* Title under image */
+    .product-card h3 {
+      margin: 16px 0 8px;
+      font-size: 1.25rem;
+      color: var(--color-primary);
+    }
+
+    /* Description box */
+    .product-desc {
+      padding: 0 16px 24px;
+      font-size: 0.95rem;
+      color: #555;
+      line-height: 1.5;
+      flex-grow: 1;
+    }
 
     /* Research */
     #research ul {
@@ -302,6 +421,120 @@
 
   <section id="features">
     <h2>Key Features</h2>
+    <div class="features-cards">
+      <!-- Subcategory 2 -->
+      <div class="feature-subcategory">Core Technology Platform</div>
+      <!-- Card 1 -->
+      <div class="feature-card">
+        <img src="images/ViewISO.gif" alt="View Quality Simulation Engine">
+        <div class="feature-info">
+          <h3>View Quality Simulation Engine</h3>
+          <p>
+            Advanced machine learning system trained on 12,000+ human satisfaction surveys that predicts occupant satisfaction with window views. Analyzes segmentation and depth information to generate precise view scores at directional, locational, room, unit, and building levels for comprehensive design optimization and property evaluation.
+          </p>
+          <a href="features/view-quality-simulation-engine.html" class="btn btn-secondary">Find out more</a>
+        </div>
+      </div>
+      <!-- Card 2 -->
+      <div class="feature-card">
+        <img src="images/PrivacyISO.gif" alt="Privacy Quality Assessment System">
+        <div class="feature-info">
+          <h3>Privacy Quality Assessment System</h3>
+          <p>
+            Sophisticated analysis engine that evaluates visual privacy using neighboring building facades, urban context, street trees, and window positioning. Assesses exposure levels and privacy concerns while maintaining balance between natural light access, desirable views, and occupant security in dense environments.
+          </p>
+          <a href="features/privacy-quality-assessment-system.html" class="btn btn-secondary">Find out more</a>
+        </div>
+      </div>
+      <!-- Card 3 -->
+      <div class="feature-card">
+        <img src="images/WVImageNet-01.png" alt="WV-ImageNet Dataset">
+        <div class="feature-info">
+          <h3>WV-ImageNet Dataset</h3>
+          <p>
+            Comprehensive dataset containing 12,000+ annotated window view images with human satisfaction ratings, segmentation maps, and depth information. Serves as the foundation for machine learning model training and enables continuous improvement of view assessment accuracy and methodology validation.
+          </p>
+          <a href="features/WV-imagenet-dataset.html" class="btn btn-secondary">Find out more</a>
+        </div>
+      </div>
+      <!-- Subcategory 2 -->
+      <div class="feature-subcategory">Market Application</div>
+      <!-- Card 1 -->
+      <div class="feature-card">
+        <img src="images/InvestmentAnalyticsSuits.gif" alt="Real Estate Intelligence Platform">
+        <div class="feature-info">
+          <h3>Real Estate Intelligence Platform</h3>
+          <p>
+            Transform property listings with automated view scoring and valuation insights. Integrates with MLS platforms, Zillow, and major listing services to help agents highlight premium views, justify pricing strategies, and differentiate properties through data-driven view quality metrics that resonate with buyers.
+          </p>
+          <a href="features/real-estate-intelligence-platform.html" class="btn btn-secondary">Find out more</a>
+        </div>
+      </div>
+      <!-- Card 2 -->
+      <div class="feature-card">
+        <img src="images/ArchitecturalDesignAssistant.gif" alt="Architectural Design Assistant">
+        <div class="feature-info">
+          <h3>Architectural Design Assistant</h3>
+          <p>
+            Real-time CAD plugin for Rhino3D, AutoCAD, and other design software that provides instant feedback on view quality, privacy levels, and occupant satisfaction. Enables architects to simulate building orientations, window placements, and urban contexts before construction to maximize development value.
+          </p>
+          <a href="features/architectural-design-assistant.html" class="btn btn-secondary">Find out more</a>
+        </div>
+      </div>
+      <!-- Card 3 -->
+      <div class="feature-card">
+        <iframe
+          src="images/pareto_front_interactive.html"
+          title="Interactive Pareto Front Analysis"
+          style="
+            width: 100%;
+            height: 100%;
+            border: none;
+            object-fit: cover;
+          "
+          loading="lazy"
+        ></iframe>
+        <div class="feature-info">
+          <h3>Investment Analytics Suite</h3>
+          <p>
+            Comprehensive due diligence platform for real estate investors and developers. Provides automated property assessment, neighborhood benchmarking, and market positioning analysis to identify undervalued properties with superior views and optimize development potential for maximum ROI across portfolio investments.
+          </p>
+          <a href="features/investment-analytics-suite.html" class="btn btn-secondary">Find out more</a>
+        </div>
+      </div>
+      <!-- Card 4 -->
+      <div class="feature-card">
+        <img src="images/HospitalityRevenue.png" alt="Hospitality Revenue Optimization">
+        <div class="feature-info">
+          <h3>Hospitality Revenue Optimization</h3>
+          <p>
+            Dynamic pricing and booking optimization system for hotels that leverages view quality scores for revenue management. Evaluates landmark visibility, water views, and nature access to help hospitality businesses optimize room rates, enhance guest satisfaction, and improve revenue per available room.
+          </p>
+          <a href="features/hospitality-revenue-optimization.html" class="btn btn-secondary">Find out more</a>
+        </div>
+      </div>
+      <!-- Subcategory 3 -->
+      <div class="feature-subcategory">Integration Capabilities</div>
+      <!-- Card 1 -->
+      <div class="feature-card">
+        <img src="images/DeploymentSolutions.png" alt="Deployment Solutions">
+        <div class="feature-info">
+          <h3>Deployment Solutions</h3>
+          <p>
+            <b>API Access:</b> Restful API for seamless integration with existing platforms and workflows<br>
+            <b>Cloud Infrastructure:</b> Scalable processing for high-volume analysis and real-time applications<br>
+            <b>Custom Solutions:</b> Tailored implementations for enterprise clients and specialized use cases<br>
+            <b>Data Export:</b> Comprehensive reporting and analytics export for business intelligence systems
+          </p>
+          <a href="features/deployment-solutions.html" class="btn btn-secondary">Find out more</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+<!--  <section id="features">
+    <h2>Key Features</h2>
     <div class="features grid-2">
       <div class="item">
         <h3>Optimize Design</h3>
@@ -320,22 +553,58 @@
         <p>Integrate Viewscore into your own systems via our RESTful endpoints.</p>
       </div>
     </div>
-  </section>
+  </section> -->
 
+<!--
   <section id="product">
     <h2>Product</h2>
     <div class="ps-grid grid-3">
       <div class="ps-item">
         <h3>Software</h3>
-        <img src="https://via.placeholder.com/300x200" alt="Software screenshot">
+        <img src="images/Software-01.png" alt="Software screenshot">
       </div>
       <div class="ps-item">
         <h3>API</h3>
-        <img src="https://via.placeholder.com/300x200" alt="API example">
+        <img src="images/API-01.png" alt="API example">
       </div>
       <div class="ps-item">
         <h3>Consulting</h3>
-        <img src="https://via.placeholder.com/300x200" alt="Consulting service">
+        <img src="images/Consulting.png" alt="Consulting service">
+      </div>
+    </div>
+  </section>-->
+
+  <section id="product">
+    <h2>Product &amp; Service</h2>
+    <div class="product-cards">
+      <!-- Card 1 -->
+      <div class="product-card">
+        <img src="images/Software-01.png" alt="Software screenshot">
+        <h3>Software</h3>
+        <div class="product-desc">
+          A full-featured desktop &amp; web app for running rapid occupant-satisfaction simulations.  
+          Visualize daylight, view quality, and privacy scores in real time as you tweak your layouts.
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="product-card">
+        <img src="images/API-01.png" alt="API example">
+        <h3>API</h3>
+        <div class="product-desc">
+          RESTful endpoints to integrate Viewscore into your own tools.  
+          Send geometry or image data, get back scored results for automated workflows.
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="product-card">
+        <img src="images/Consulting.png" alt="Consulting service">
+        <h3>Consulting</h3>
+        <div class="product-desc">
+          Tailored onsite and remote consulting packages.  
+          We’ll help you set up custom pipelines, interpret results, and train your team.
+        </div>
       </div>
     </div>
   </section>
@@ -471,3 +740,15 @@
 </body>
 </html>
 
+<!--
+"""
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(html)
+print("✓ Generated index.html")
+
+# 2. Serve it at http://localhost:8000
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+PORT = 8000
+print(f"🚀 Serving on http://localhost:{PORT}\nPress Ctrl+C to stop.")
+server = HTTPServer(("0.0.0.0", PORT), SimpleHTTPRequestHandler)
+server.serve_forever()-->
