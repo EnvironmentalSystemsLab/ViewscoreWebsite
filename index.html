@@ -407,19 +407,20 @@ html = """
     
     /* 2. HERO: stack content and tighten */
     .slides {
-      position: relative;
+      position: static;
       height: auto;
     }
 
     /* 3) Force every slide back to absolute, full-container */
     .slide {
-      position: absolute !important;
-      height: auto;
-      top: 0; left: 0; right: 0; bottom: 0;
+      position: static !important;
+      height: none;
+      top: auto; left: auto; right: auto; bottom: auto;
       background: none !important;       /* hide the desktop bg-image */
       opacity: 0;                         /* keep the opacity rules */
     }
     .slide.active {
+      display: block;
       opacity: 1;
     }
 
@@ -437,6 +438,7 @@ html = """
       height: auto !important;
       overflow: visible;
       padding: 0 5% 1rem;               /* tighten up */
+      margin-bottom: 2rem;
     }
 
     /* 6) Flow the caption under the slides */
@@ -489,7 +491,7 @@ html = """
     .feature-card p {
       order: 3;
       margin: 0;
-      text-align: center;
+      text-align: end;
       font-size: 1rem;           /* adjust as needed */
       line-height: 1.4;
     }
