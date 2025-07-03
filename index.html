@@ -406,44 +406,46 @@ html = """
     .hamburger { display: flex; }
     
     /* 2. HERO: stack content and tighten */
+    .slides {
+      position: relative;
+    }
+
+    /* 3) Force every slide back to absolute, full-container */
+    .slide {
+      position: absolute !important;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: none !important;       /* hide the desktop bg-image */
+      opacity: 0;                         /* keep the opacity rules */
+    }
+    .slide.active {
+      opacity: 1;
+    }
+
+    /* 4) Show your <img> as the mobile background */
+    .slide-img {                        /* you added this in the HTML */
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* 5) Let the hero <img> container size itself, then put text below */
     .hero {
-      /* drop the fixed aspect ratio */
       aspect-ratio: auto !important;
       height: auto !important;
       overflow: visible;
-      padding: 0;             /* tighten up */
-    }
-    .slides {
-      display: block;         /* stack slides one after another */
+      padding: 0 5% 1rem;               /* tighten up */
     }
 
-    .slide {
-      position: static !important;      /* no more absolute layering */
-      background: none !important;      /* hide the desktop bg */
-      margin-bottom: 1rem;              /* space between slides */
-    }
-
-    .slide-img {
-      display: block;        /* now show the img */
-    }
-
+    /* 6) Flow the caption under the slides */
     .hero-content {
-      position: static !important;  /* flow with document */
-      margin: 0 5% 2rem;            /* some breathing room */
-      max-width: none;
-      text-align: center;           /* center your headings/buttons */
+      position: static !important;
+      margin: 1rem 0;
+      text-align: center;
     }
 
-    .hero-content h1 {
-      font-size: 2rem;
-      line-height: 1.2;
-    }
-
-    .hero-content p {
-      font-size: 1rem;
-      margin-bottom: 1rem;
-    }
-
+    .hero-content h1 { font-size: 2rem; }
+    .hero-content p  { font-size: 1rem; margin-bottom: 1rem; }
     .btn {
       display: inline-block;
       margin: 0.5rem 0.25rem;
@@ -456,13 +458,39 @@ html = """
       padding: 40px 5%;
     }
     .feature-card {
-      grid-template-columns: 1fr;
+      /* switch off the two-column layout */
+      display: flex;
+      flex-direction: column;
+      align-items: center;      /* center everything, or use flex-start */
+      gap: 0.75rem;              /* space between items */
+      padding: 1rem 5%;          /* optional breathing room */
     }
+
+    /* 1) Title on top */
+    .feature-card h3 {
+      order: 1;
+      margin: 0;
+      text-align: center;
+      font-size: 1.25rem;        /* adjust as needed */
+    }
+
+    /* 2) Then the image, full-width */
     .feature-card img {
+      order: 2;
+      width: 100%;
       height: auto;
       object-fit: cover;
+      border-radius: 4px;        /* optional */
     }
-    .feature-info { padding: 16px; }
+
+    /* 3) Finally the paragraph */
+    .feature-card p {
+      order: 3;
+      margin: 0;
+      text-align: center;
+      font-size: 1rem;           /* adjust as needed */
+      line-height: 1.4;
+    }
 
     /* 4. PRODUCT CARDS: single column */
     .product-cards {
@@ -510,7 +538,7 @@ html = """
 
   <section class="hero" role="banner">
     <div class="slides">
-      <div class="slide active">
+      <div class="slide active" style="background-image: url('images/TitleImage1.png')">
         <img class="slide-img" src="images/TitleImage1.png" alt="Predictive Design Intelligence">
         <div class="hero-content">
           <h1>Predictive<br>Design Intelligence</h1>
@@ -519,7 +547,7 @@ html = """
           <a href="#features" class="btn">Learn More</a>
         </div>
       </div>
-      <div class="slide">
+      <div class="slide" style="background-image: url('images/TitleImage2.png')">
         <img class="slide-img" src="images/TitleImage2.png" alt="Boost Your Listing">
         <div class="hero-content">
           <h1>Boost<br>Your Listing</h1>
