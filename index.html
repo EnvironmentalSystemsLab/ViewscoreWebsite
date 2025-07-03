@@ -408,11 +408,13 @@ html = """
     /* 2. HERO: stack content and tighten */
     .slides {
       position: relative;
+      height: auto;
     }
 
     /* 3) Force every slide back to absolute, full-container */
     .slide {
       position: absolute !important;
+      height: auto;
       top: 0; left: 0; right: 0; bottom: 0;
       background: none !important;       /* hide the desktop bg-image */
       opacity: 0;                         /* keep the opacity rules */
@@ -425,7 +427,7 @@ html = """
     .slide-img {                        /* you added this in the HTML */
       display: block;
       width: 100%;
-      height: 100%;
+      height: auto;
       object-fit: cover;
     }
 
