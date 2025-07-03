@@ -377,6 +377,80 @@ html = """
       nav.show { display: flex; }
       .hamburger { display: flex; }
     }
+
+    /* MOBILE FIRST ADJUSTMENTS */
+    @media (max-width: 768px) {
+    /* 1. NAVIGATION: always show hamburger, hide inline links */
+    .nav-container nav {
+      display: none;
+      position: absolute;
+      top: 56px; right: 5%;
+      flex-direction: column;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-radius: 4px;
+      width: calc(100% - 40px);
+    }
+    .hamburger { display: flex; }
+    
+    /* 2. HERO: stack content and tighten */
+    .hero {
+      aspect-ratio: unset;
+      height: auto;
+      padding: 10px 5%;
+    }
+    .hero .slide { background-position: center top; }
+    .hero-content {
+      bottom: 10%; left: 5%;
+      max-width: 90%;
+    }
+    .hero h1 { font-size: 2rem; line-height: 1.2; }
+    .hero p { font-size: 1rem; }
+    .btn {
+      padding: 10px 16px;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .btn + .btn { margin-left: 0; }
+
+    /* 3. FEATURE CARDS: one-column stack */
+    .features-cards {
+      gap: 24px;
+      padding: 40px 5%;
+    }
+    .feature-card {
+      grid-template-columns: 1fr;
+    }
+    .feature-card img {
+      height: auto;
+      object-fit: cover;
+    }
+    .feature-info { padding: 16px; }
+
+    /* 4. PRODUCT CARDS: single column */
+    .product-cards {
+      grid-template-columns: 1fr;
+      padding: 40px 5%;
+    }
+
+    /* 5. TEAM & CONTACT: collapse to one column */
+    .team-item { margin: 0 auto 24px; }
+    .team-grid { display: flex; flex-direction: column; align-items: center; }
+    .contact-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      padding: 0 5%;
+    }
+
+    /* 6. VIDEO DEMO: fullwidth */
+    #demo.demo video {
+      max-width: 100%;
+      margin-bottom: 16px;
+    }
+  }
+
   </style>
 </head>
 <body>
