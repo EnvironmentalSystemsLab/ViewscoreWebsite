@@ -441,6 +441,12 @@ html = """
       margin-bottom: 2rem;
     }
 
+    .hero .slide,
+    .hero .slide.active {
+      opacity: 1 !important;      /* force full opacity */
+      display: block !important;  /* make sure it’s in flow */
+    }
+
     .hero .slide {
       transition: none !important;
     }
